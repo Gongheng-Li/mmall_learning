@@ -265,6 +265,7 @@
           <target>1.8</target>
           <encoding>UTF-8</encoding>
           <compilerArguments>
+<!--            会把该目录下的文件打包进war包发布到线上-->
             <extdirs>${project.basedir}/src/main/webapp/WEB-INF/lib</extdirs>
           </compilerArguments>
         </configuration>
