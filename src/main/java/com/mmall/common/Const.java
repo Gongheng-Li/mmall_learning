@@ -36,6 +36,10 @@ public class Const {
         String RESPONSE_FAILED = "failed";
     }
 
+    public interface RedisCacheExpireTime {
+        int REDIS_SESSION_EXPIRE_TIME = 60 * 30; // 30min
+    }
+
     public enum ProductStatusEnum {
         ON_SALE(1, "在线");
 
