@@ -1,39 +1,39 @@
 package com.mmall.util;
 
-import com.mmall.common.RedisPool;
+import com.mmall.common.RedisShardedPool;
 import lombok.extern.slf4j.Slf4j;
-import redis.clients.jedis.Jedis;
+import redis.clients.jedis.ShardedJedis;
 
 @Slf4j
-public class RedisPoolUtil {
+public class RedisShardedPoolUtil {
 
     public static String set(String key, String value) {
-        Jedis jedis = null;
+        ShardedJedis jedis = null;
         String result = null;
         try {
-            jedis = RedisPool.getResource();
+            jedis = RedisShardedPool.getResource();
             result = jedis.set(key, value);
         } catch (Exception e) {
             log.error("set error, key: {} value: {}", key, value, e);
-            RedisPool.returnBrokenResource(jedis);
+            RedisShardedPool.returnBrokenResource(jedis);
             return null;
         }
-        RedisPool.returnResource(jedis);
+        RedisShardedPool.returnResource(jedis);
         return result;
     }
 
     public static String get(String key) {
-        Jedis jedis = null;
+        ShardedJedis jedis = null;
         String result = null;
         try {
-            jedis = RedisPool.getResource();
+            jedis = RedisShardedPool.getResource();
             result = jedis.get(key);
         } catch (Exception e) {
             log.error("set key: {} error", key, e);
-            RedisPool.returnBrokenResource(jedis);
+            RedisShardedPool.returnBrokenResource(jedis);
             return null;
         }
-        RedisPool.returnResource(jedis);
+        RedisShardedPool.returnResource(jedis);
         return result;
     }
 
@@ -42,17 +42,17 @@ public class RedisPoolUtil {
      * @param exTime 单位为秒
      */
     public static String setEx(String key, String value, int exTime) {
-        Jedis jedis = null;
+        ShardedJedis jedis = null;
         String result = null;
         try {
-            jedis = RedisPool.getResource();
+            jedis = RedisShardedPool.getResource();
             result = jedis.setex(key, exTime, value);
         } catch (Exception e) {
             log.error("setEx error, key: {} value: {} expire time: {}", key, value, exTime, e);
-            RedisPool.returnBrokenResource(jedis);
+            RedisShardedPool.returnBrokenResource(jedis);
             return null;
         }
-        RedisPool.returnResource(jedis);
+        RedisShardedPool.returnResource(jedis);
         return result;
     }
 
@@ -61,41 +61,41 @@ public class RedisPoolUtil {
      * @param exTime 单位为秒
      */
     public static Long expire(String key, int exTime) {
-        Jedis jedis = null;
+        ShardedJedis jedis = null;
         Long result = null;
         try {
-            jedis = RedisPool.getResource();
+            jedis = RedisShardedPool.getResource();
             result = jedis.expire(key, exTime);
         } catch (Exception e) {
             log.error("expire error, key: {} expire time: {}", key, exTime, e);
-            RedisPool.returnBrokenResource(jedis);
+            RedisShardedPool.returnBrokenResource(jedis);
             return null;
         }
-        RedisPool.returnResource(jedis);
+        RedisShardedPool.returnResource(jedis);
         return result;
     }
 
     public static Long del(String key) {
-        Jedis jedis = null;
+        ShardedJedis jedis = null;
         Long result = null;
         try {
-            jedis = RedisPool.getResource();
+            jedis = RedisShardedPool.getResource();
             result = jedis.del(key);
         } catch (Exception e) {
             log.error("set key: {} error", key, e);
-            RedisPool.returnBrokenResource(jedis);
+            RedisShardedPool.returnBrokenResource(jedis);
             return null;
         }
-        RedisPool.returnResource(jedis);
+        RedisShardedPool.returnResource(jedis);
         return result;
     }
 
     public static void main(String[] args) {
-        RedisShardedPoolUtil.set("keyTest", "valueTest");
-        String value = RedisShardedPoolUtil.get("keyTest");
-        RedisShardedPoolUtil.setEx("keyEx", "valueEx", 60*10);
-        RedisShardedPoolUtil.expire("keyTest", 60*20);
-        RedisShardedPoolUtil.del("keyTest");
+        RedisPoolUtil.set("keyTest", "valueTest");
+        String value = RedisPoolUtil.get("keyTest");
+        RedisPoolUtil.setEx("keyEx", "valueEx", 60*10);
+        RedisPoolUtil.expire("keyTest", 60*20);
+        RedisPoolUtil.del("keyTest");
         System.out.println("end of program");
     }
 }
