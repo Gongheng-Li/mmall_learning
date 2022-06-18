@@ -78,7 +78,7 @@ public class JsonUtil {
             return null;
         }
         try {
-            return typeReference.getType().equals(String.class) ? (T) str : objectMapper.readValue(str, typeReference);
+            return (T) (typeReference.getType().equals(String.class) ? str : objectMapper.readValue(str, typeReference));
         } catch (IOException e) {
             log.warn("Parse String to Object error", e);
             return null;
