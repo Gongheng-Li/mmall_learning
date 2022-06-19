@@ -34,9 +34,12 @@ public class UserSpringSessionController {
      * @param session
      * @return
      */
-    @RequestMapping(value = "login.do", method = RequestMethod.POST) // 只能接收post类型的请求
+    @RequestMapping(value = "login.do", method = RequestMethod.GET) // 只能接收post类型的请求
     @ResponseBody // 自动通过SpringMVC的jackson插件将返回值序列化为json
     public ServerResponse<User> login(String username, String password, HttpSession session, HttpServletResponse httpServletResponse) {
+        // 测试全局异常
+//        int i = 0;
+//        int j = 1 / i;
         ServerResponse<User> response = iUserService.login(username, password);
         if (response.isSuccess()) {
             session.setAttribute(Const.CURRENT_USER, response.getData());
@@ -46,7 +49,7 @@ public class UserSpringSessionController {
         return response;
     }
 
-    @RequestMapping(value = "logout.do", method = RequestMethod.POST)
+    @RequestMapping(value = "logout.do", method = RequestMethod.GET)
     @ResponseBody
     public ServerResponse<String> logout(HttpSession session, HttpServletRequest request, HttpServletResponse response) {
 //        String loginToken = CookieUtil.readLoginToken(request);
@@ -56,7 +59,7 @@ public class UserSpringSessionController {
         return ServerResponse.createBySuccess();
     }
 
-    @RequestMapping(value = "get_user_info.do", method = RequestMethod.POST)
+    @RequestMapping(value = "get_user_info.do", method = RequestMethod.GET)
     @ResponseBody
     public ServerResponse<User> getUserInfo(HttpSession session, HttpServletRequest request) {
 //        String loginToken = CookieUtil.readLoginToken(request);
