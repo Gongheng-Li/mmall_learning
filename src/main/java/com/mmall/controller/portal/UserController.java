@@ -34,7 +34,7 @@ public class UserController {
      * @param session
      * @return
      */
-    @RequestMapping(value = "login.do", method = RequestMethod.POST) // 只能接收post类型的请求
+    @RequestMapping(value = "login.do", method = RequestMethod.GET) // 只能接收post类型的请求
     @ResponseBody // 自动通过SpringMVC的jackson插件将返回值序列化为json
     public ServerResponse<User> login(String username, String password, HttpSession session, HttpServletResponse httpServletResponse) {
         ServerResponse<User> response = iUserService.login(username, password);

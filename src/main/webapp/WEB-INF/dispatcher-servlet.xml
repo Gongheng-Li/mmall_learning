@@ -38,8 +38,21 @@
     <bean id="multipartResolver" class="org.springframework.web.multipart.commons.CommonsMultipartResolver">
         <property name="maxUploadSize" value="10485760"/> <!-- 10m -->
         <property name="maxInMemorySize" value="4096" />
-        <property name="defaultEncoding" value="UTF-8"></property>
+        <property name="defaultEncoding" value="UTF-8"/>
     </bean>
+
+<!--    intercept: 拦截，阻截-->
+    <mvc:interceptors>
+<!--        直接定义在interceptors节点下的bean拦截器会拦截所有请求-->
+<!--        <bean></bean>-->
+        <mvc:interceptor>
+<!--            /manage/** 这种表述方式是指manage目录下的请求以及manage的所有子目录下的请求-->
+            <mvc:mapping path="/manage/**"/>
+<!--            不拦截登录请求，防止形成登录死循环-->
+<!--            <mvc:exclude-mapping path="/manage/user/login.do"/>-->
+            <bean class="com.mmall.controller.common.interceptor.AuthorityInterceptor"/>
+        </mvc:interceptor>
+    </mvc:interceptors>
 
 
 </beans>
