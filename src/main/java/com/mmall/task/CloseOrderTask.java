@@ -84,8 +84,9 @@ public class CloseOrderTask {
         RLock lock = redissonManager.getRedisson().getLock(Const.REDIS_LOCK.CLOSE_ORDER_TASK_LOCK);
         boolean getLock = false;
         try {
-            if (getLock = lock.tryLock(2, 5, TimeUnit.SECONDS)) {
-                log.info("线程{}获取到了锁{}", Thread.currentThread().getName(), Const.REDIS_LOCK.CLOSE_ORDER_TASK_LOCK);
+            getLock = lock.tryLock(2, 5, TimeUnit.SECONDS);
+            if (getLock) {
+                log.info("v4 线程{}获取到了锁{}", Thread.currentThread().getName(), Const.REDIS_LOCK.CLOSE_ORDER_TASK_LOCK);
                 int hour = Integer.parseInt(PropertiesUtil.getProperty("close.order.task.time.hour", "2"));
 //                iOrderService.closeOrder(hour);
             } else {
@@ -98,32 +99,8 @@ public class CloseOrderTask {
                 return;
             }
             lock.unlock();
-            log.info("线程{}释放了锁{}", Thread.currentThread().getName(), Const.REDIS_LOCK.CLOSE_ORDER_TASK_LOCK);
+            log.info("v4 线程{}释放了锁{}", Thread.currentThread().getName(), Const.REDIS_LOCK.CLOSE_ORDER_TASK_LOCK);
         }
-
-        log.info("关闭订单定时任务启动");
-        long lockTimeout = Long.parseLong(PropertiesUtil.getProperty("lock.timeout", "5000"));
-        Long setnxResult = RedisShardedPoolUtil.setnx(Const.REDIS_LOCK.CLOSE_ORDER_TASK_LOCK, String.valueOf(System.currentTimeMillis() + lockTimeout));
-        if (setnxResult != null && setnxResult.intValue() == 1) {
-            // 获取分布式锁成功
-            closeOrder(Const.REDIS_LOCK.CLOSE_ORDER_TASK_LOCK);
-        } else {
-            // 未获取到锁，继续判断时间戳，看是否可以重置并获取到锁
-            String lockValueStr = RedisShardedPoolUtil.get(Const.REDIS_LOCK.CLOSE_ORDER_TASK_LOCK);
-            if (lockValueStr == null || System.currentTimeMillis() > Long.parseLong(lockValueStr)) {
-                String getSetResult = RedisShardedPoolUtil.getSet(Const.REDIS_LOCK.CLOSE_ORDER_TASK_LOCK, String.valueOf(System.currentTimeMillis() + lockTimeout));
-                // 此处重新拿键的旧值而不是使用之前的lockValueStr，是因为在tomcat集群应用中，有可能会有其他进程更改了这个值
-                if (getSetResult == null || StringUtils.equals(getSetResult, lockValueStr)) {
-                    // 真正获取到锁
-                    closeOrder(Const.REDIS_LOCK.CLOSE_ORDER_TASK_LOCK);
-                } else {
-                    log.info("获取分布式锁失败：{}", Const.REDIS_LOCK.CLOSE_ORDER_TASK_LOCK);
-                }
-            } else {
-                log.info("获取分布式锁失败：{}", Const.REDIS_LOCK.CLOSE_ORDER_TASK_LOCK);
-            }
-        }
-        log.info("关闭订单定时任务结束");
     }
 
     private void closeOrder(String lockName) {
